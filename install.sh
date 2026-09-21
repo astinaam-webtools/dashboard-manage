@@ -242,19 +242,42 @@ RestartSec=5
 
 [Install]
 WantedBy=default.target
+  cat << EOF > "$SYSTEMD_USER_DIR/dashboard-healthcheck.service"
+[Unit]
+Description=Services Dashboard Health Check
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=$GLOBAL_BIN check
 EOF
+
+  cat << EOF > "$SYSTEMD_USER_DIR/dashboard-healthcheck.timer"
+[Unit]
+Description=Run Services Dashboard Health Check every 5 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
   systemctl --user daemon-reload
   systemctl --user enable --now dashboard-manage.service 2>/dev/null || true
-  echo -e "${GREEN}✓${NC} Systemd user service enabled and started (dashboard-manage.service)"
+  systemctl --user enable --now dashboard-healthcheck.timer 2>/dev/null || true
+  echo -e "${GREEN}✓${NC} Systemd user services enabled and started (dashboard-manage.service, dashboard-healthcheck.timer [5m])"
 elif [ "$USER_MODE" = false ] && [ "$INSTALL_CRON" = true ] && command -v crontab &>/dev/null; then
-  echo -e "${BLUE}==>${NC} Setting up automated health check cron job..."
-  CRON_CMD="* * * * * /usr/bin/python3 $CLI_TARGET_DIR/scripts/check_status.py >/dev/null 2>&1"
+  echo -e "${BLUE}==>${NC} Setting up automated 5-minute health check cron job..."
+  CRON_CMD="*/5 * * * * /usr/bin/python3 $CLI_TARGET_DIR/scripts/check_status.py >/dev/null 2>&1"
   CURRENT_CRON="$(crontab -l 2>/dev/null || true)"
   if echo "$CURRENT_CRON" | grep -Fq "check_status.py"; then
     echo -e "${YELLOW}ℹ${NC} Crontab already contains check_status.py job."
   else
     (echo "$CURRENT_CRON"; echo "$CRON_CMD") | crontab -
-    echo -e "${GREEN}✓${NC} Added health check job to crontab."
+    echo -e "${GREEN}✓${NC} Added 5-minute health check job to crontab."
   fi
 fi
 

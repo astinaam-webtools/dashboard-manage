@@ -54,21 +54,25 @@ fi
 
 echo -e "${BLUE}==>${NC} Uninstalling Services Dashboard & Global Skill..."
 
-# 1. Stop and remove systemd user service
+# 1. Stop and remove systemd user services and timers
 if command -v systemctl &>/dev/null; then
-  if systemctl --user is-active --quiet dashboard-manage.service 2>/dev/null; then
-    systemctl --user stop dashboard-manage.service 2>/dev/null || true
-    echo -e "${GREEN}✓${NC} Stopped dashboard-manage.service"
-  fi
-  if systemctl --user is-enabled --quiet dashboard-manage.service 2>/dev/null; then
-    systemctl --user disable dashboard-manage.service 2>/dev/null || true
-    echo -e "${GREEN}✓${NC} Disabled dashboard-manage.service"
-  fi
-  if [ -f "$HOME/.config/systemd/user/dashboard-manage.service" ]; then
-    rm -f "$HOME/.config/systemd/user/dashboard-manage.service"
-    systemctl --user daemon-reload 2>/dev/null || true
-    echo -e "${GREEN}✓${NC} Removed ~/.config/systemd/user/dashboard-manage.service"
-  fi
+  for UNIT in dashboard-healthcheck.timer dashboard-manage.service; do
+    if systemctl --user is-active --quiet "$UNIT" 2>/dev/null; then
+      systemctl --user stop "$UNIT" 2>/dev/null || true
+      echo -e "${GREEN}✓${NC} Stopped $UNIT"
+    fi
+    if systemctl --user is-enabled --quiet "$UNIT" 2>/dev/null; then
+      systemctl --user disable "$UNIT" 2>/dev/null || true
+      echo -e "${GREEN}✓${NC} Disabled $UNIT"
+    fi
+  done
+  for FILE in dashboard-manage.service dashboard-healthcheck.service dashboard-healthcheck.timer; do
+    if [ -f "$HOME/.config/systemd/user/$FILE" ]; then
+      rm -f "$HOME/.config/systemd/user/$FILE"
+      echo -e "${GREEN}✓${NC} Removed ~/.config/systemd/user/$FILE"
+    fi
+  done
+  systemctl --user daemon-reload 2>/dev/null || true
 fi
 
 # 2. Remove CLI binaries

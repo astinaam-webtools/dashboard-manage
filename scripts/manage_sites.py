@@ -430,10 +430,12 @@ def cmd_serve(args, config):
     except Exception as e:
         print(f"Warning: Initial health check failed: {e}", file=sys.stderr)
 
+    check_interval = getattr(args, "check_interval", 300) or 300
+
     # Background health check thread
     def health_worker():
         while True:
-            time.sleep(60)
+            time.sleep(check_interval)
             try:
                 run_health_check(config)
             except Exception as ex:
@@ -479,6 +481,7 @@ def main():
     p_serve.add_argument("--port", type=int, default=8080, help="Port to bind (default: 8080)")
     p_serve.add_argument("--host", default="0.0.0.0", help="Host interface to bind (default: 0.0.0.0)")
     p_serve.add_argument("--web-dir", help="Path to static web directory")
+    p_serve.add_argument("--check-interval", type=int, default=300, help="Interval in seconds between health checks (default: 300)")
     p_serve.set_defaults(func=lambda args: cmd_serve(args, config))
 
     # list
