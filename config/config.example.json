@@ -1,0 +1,7 @@
+{
+  "web_dir": "/var/www/html",
+  "lan_host": "raspberrypi.local",
+  "tailscale_host": "raspberrypi.tailnet.ts.net",
+  "tailscale_ip": "100.64.0.1",
+  "auto_detect": true
+}

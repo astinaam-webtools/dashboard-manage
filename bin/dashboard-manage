@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# dashboard-manage launcher
+set -e
+
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+# Check relative scripts directory
+if [ -f "$DIR/../scripts/manage_sites.py" ]; then
+  exec python3 "$DIR/../scripts/manage_sites.py" "$@"
+elif [ -f "$DIR/scripts/manage_sites.py" ]; then
+  exec python3 "$DIR/scripts/manage_sites.py" "$@"
+elif [ -f "$HOME/.agents/skills/manage-dashboard/scripts/manage_sites.py" ]; then
+  exec python3 "$HOME/.agents/skills/manage-dashboard/scripts/manage_sites.py" "$@"
+else
+  echo "Error: manage_sites.py could not be found." >&2
+  exit 1
+fi

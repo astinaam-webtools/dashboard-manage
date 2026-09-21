@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Pi Services">
+  <title>Services Hub • Hosted Apps & Ports</title>
+  
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(18, 24, 38, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover: rgba(26, 34, 53, 0.95);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.2);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.25);
+      --rose: #f43f5e;
+      --amber: #f59e0b;
+      --purple: #a855f7;
+      --cyan: #06b6d4;
+      --orange: #f97316;
+      --nav-bg: rgba(9, 13, 22, 0.88);
+      --btn-bg: rgba(255, 255, 255, 0.06);
+      --btn-hover: rgba(255, 255, 255, 0.12);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --card-hover: #ffffff;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      --accent: #2563eb;
+      --accent-glow: rgba(37, 99, 235, 0.15);
+      --nav-bg: rgba(248, 250, 252, 0.92);
+      --btn-bg: rgba(0, 0, 0, 0.05);
+      --btn-hover: rgba(0, 0, 0, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      padding-bottom: 90px;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(168, 85, 247, 0.06) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Fixed / Sticky Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--nav-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 16px;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #e11d48, #be123c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+      color: white;
+      font-size: 18px;
+    }
+
+    .brand-title h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--btn-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-icon:hover {
+      background: var(--btn-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-icon:active {
+      transform: scale(0.94);
+    }
+
+    /* Network Detection Banner */
+    .network-badge-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+    }
+
+    .net-mode {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .net-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
+    }
+
+    .net-stats {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+
+    /* Search & Filter Bar */
+    .controls-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 42px;
+      background: var(--btn-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 0 40px 0 40px;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    .clear-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: none;
+    }
+
+    /* Category Filter Pills */
+    .categories {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .categories::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-btn {
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      background: var(--btn-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .cat-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      box-shadow: 0 2px 10px var(--accent-glow);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1200px;
+      margin: 18px auto;
+      padding: 0 16px;
+    }
+
+    /* Grid of Cards */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Service Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: white;
+    }
+
+    .card-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .card-title {
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--text-dim);
+    }
+
+    .status-dot.online {
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    .status-dot.offline {
+      background: var(--rose);
+      box-shadow: 0 0 6px var(--rose);
+    }
+
+    .card-badges {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-port {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .badge-cat {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 38px;
+    }
+
+    /* Links & Buttons in Card */
+    .card-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .link-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      background: var(--btn-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    .link-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .link-url-wrap {
+      flex: 1;
+      min-width: 0;
+      text-align: right;
+    }
+
+    .link-url {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.76rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    .link-url:hover {
+      text-decoration: underline;
+    }
+
+    .btn-copy {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      flex-shrink: 0;
+      transition: color 0.15s, background-color 0.15s;
+    }
+
+    .btn-copy:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-launch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      margin-top: 4px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-launch:active {
+      transform: scale(0.97);
+    }
+
+    .btn-launch:hover {
+      opacity: 0.95;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+    }
+
+    /* Footer Info */
+    footer {
+      max-width: 1200px;
+      margin: 40px auto 0;
+      padding: 0 16px;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-chip {
+      background: var(--btn-bg);
+      border: 1px solid var(--card-border);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.75rem;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.95);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 100;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+      opacity: 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Category colors */
+    .icon-games { background: linear-gradient(135deg, #10b981, #059669); }
+    .icon-media { background: linear-gradient(135deg, #f97316, #ea580c); }
+    .icon-apps { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .icon-ai { background: linear-gradient(135deg, #a855f7, #7c3aed); }
+    .icon-utilities { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .icon-apis { background: linear-gradient(135deg, #64748b, #475569); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <div class="top-row">
+        <a href="/" class="brand">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
+          <div class="brand-title">
+            <h1>Raspberry Pi Hub</h1>
+            <p>Port 80 Unified Gateway</p>
+          </div>
+        </a>
+
+        <div class="header-actions">
+          <button id="btn-refresh" class="btn-icon" title="Refresh service health" aria-label="Refresh">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+          </button>
+          <button id="btn-theme" class="btn-icon" title="Toggle theme" aria-label="Theme">
+            <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Network Detection Banner -->
+      <div class="network-badge-banner">
+        <div class="net-mode">
+          <span class="net-dot"></span>
+          <span id="network-indicator">Detecting network...</span>
+        </div>
+        <div class="net-stats">
+          <span id="service-count-text">16 services</span> • Port 80
+        </div>
+      </div>
+
+      <!-- Search & Category Filters -->
+      <div class="controls-row">
+        <div class="search-wrap">
+          <span class="search-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search by name, port (e.g. 2283), or category..." autocomplete="off">
+          <button id="clear-search" class="clear-icon" aria-label="Clear search">✕</button>
+        </div>
+
+        <div class="categories" id="category-pills">
+          <button class="cat-btn active" data-cat="all">All (<span id="count-all">0</span>)</button>
+          <button class="cat-btn" data-cat="apps">Apps</button>
+          <button class="cat-btn" data-cat="ai">AI & Dev</button>
+          <button class="cat-btn" data-cat="games">Games</button>
+          <button class="cat-btn" data-cat="media">Media</button>
+          <button class="cat-btn" data-cat="utilities">Utilities</button>
+          <button class="cat-btn" data-cat="apis">APIs</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="services-grid" class="grid">
+      <!-- Cards rendered via JavaScript -->
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-links">
+      <span class="footer-chip" id="footer-lan">LAN: Connected</span>
+      <span class="footer-chip" id="footer-tailscale">Tailscale: Supported</span>
+      <span class="footer-chip">Port 80 Web Hub</span>
+    </div>
+    <p>Manage via global agent skill: <code>dashboard-manage add|remove|list</code></p>
+  </footer>
+
+  <div id="toast" class="toast">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 6L9 17l-5-5"></path>
+    </svg>
+    <span id="toast-text">Copied to clipboard</span>
+  </div>
+
+  <!-- Fallback Embedded Data -->
+  <script id="initial-services" type="application/json">
+[
+  {
+    "id": "nextjs-portal",
+    "name": "Next.js Web Portal",
+    "description": "Modern frontend web dashboard and portal interface built with Next.js & Tailwind CSS",
+    "category": "apps",
+    "port": 3000,
+    "path": "/",
+    "protocol": "http",
+    "lan_url": "http://192.168.1.100:3000/",
+    "tailscale_url": "http://my-pi.tailnet.ts.net:3000/",
+    "tailscale_ip_url": "http://100.64.0.1:3000/",
+    "badge": "Next.js",
+    "icon": "globe"
+  },
+  {
+    "id": "uptime-kuma",
+    "name": "Uptime Kuma",
+    "description": "Self-hosted monitoring tool with clean status pages and incident alerting",
+    "category": "utilities",
+    "port": 3001,
+    "path": "/",
+    "protocol": "http",
+    "lan_url": "http://192.168.1.100:3001/",
+    "tailscale_url": "http://my-pi.tailnet.ts.net:3001/",
+    "tailscale_ip_url": "http://100.64.0.1:3001/",
+    "badge": "Docker",
+    "icon": "health"
+  },
+  {
+    "id": "ollama-webui",
+    "name": "Ollama LLM Interface",
+    "description": "Local LLM chat interface and prompt workspace running quantized models",
+    "category": "ai",
+    "port": 8080,
+    "path": "/",
+    "protocol": "http",
+    "lan_url": "http://192.168.1.100:8080/",
+    "tailscale_url": "http://my-pi.tailnet.ts.net:8080/",
+    "tailscale_ip_url": "http://100.64.0.1:8080/",
+    "badge": "AI Studio",
+    "icon": "sparkles"
+  },
+  {
+    "id": "fastapi-backend",
+    "name": "FastAPI REST Service",
+    "description": "High-performance Python asynchronous API with interactive Swagger documentation",
+    "category": "apis",
+    "port": 8000,
+    "path": "/docs",
+    "protocol": "http",
+    "lan_url": "http://192.168.1.100:8000/docs",
+    "tailscale_url": "http://my-pi.tailnet.ts.net:8000/docs",
+    "tailscale_ip_url": "http://100.64.0.1:8000/docs",
+    "badge": "FastAPI",
+    "icon": "api"
+  },
+  {
+    "id": "sensory-games",
+    "name": "Mini Games Playroom",
+    "description": "Interactive HTML5 and WebGL mini-games served directly via Nginx subpath",
+    "category": "games",
+    "port": 80,
+    "path": "/games/",
+    "protocol": "http",
+    "lan_url": "http://192.168.1.100/games/",
+    "tailscale_url": "https://my-pi.tailnet.ts.net/games/",
+    "tailscale_ip_url": "https://my-pi.tailnet.ts.net/games/",
+    "badge": "WebGL Game",
+    "icon": "gamepad"
+  },
+  {
+    "id": "media-gallery",
+    "name": "Media & Photo Gallery",
+    "description": "Fast self-hosted media gallery and backup viewer for personal photos and videos",
+    "category": "media",
+    "port": 2283,
+    "path": "/",
+    "protocol": "http",
+    "lan_url": "http://192.168.1.100:2283/",
+    "tailscale_url": "http://my-pi.tailnet.ts.net:2283/",
+    "tailscale_ip_url": "http://100.64.0.1:2283/",
+    "badge": "Media App",
+    "icon": "photos"
+  },
+  {
+    "id": "grafana-metrics",
+    "name": "Grafana Dashboards",
+    "description": "Real-time system telemetry, temperature, CPU/memory stats, and Prometheus dashboards",
+    "category": "utilities",
+    "port": 3002,
+    "path": "/",
+    "protocol": "http",
+    "lan_url": "http://192.168.1.100:3002/",
+    "tailscale_url": "http://my-pi.tailnet.ts.net:3002/",
+    "tailscale_ip_url": "http://100.64.0.1:3002/",
+    "badge": "Metrics",
+    "icon": "chart"
+  }
+]
+</script>
+
+  <script>
+    // SVGs mapping for icons
+    const ICONS = {
+      gamepad: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"></line><line x1="8" y1="10" x2="8" y2="14"></line><line x1="15" y1="13" x2="15.01" y2="13"></line><line x1="18" y1="11" x2="18.01" y2="11"></line><rect x="2" y="6" width="20" height="12" rx="6"></rect></svg>`,
+      car: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>`,
+      photos: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
+      health: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>`,
+      pilot: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 19 21 12 17 5 21 12 2"></polygon></svg>`,
+      wallet: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`,
+      sparkles: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>`,
+      chart: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>`,
+      bell: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>`,
+      terminal: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>`,
+      workflow: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"></rect><rect x="15" y="15" width="6" height="6" rx="1"></rect><path d="M6 9v3a3 3 0 0 0 3 3h6"></path></svg>`,
+      printer: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>`,
+      server: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>`,
+      api: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>`,
+      trending: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>`,
+      code: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+      globe: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`
+    };
+
+    let allServices = [];
+    let serviceStatuses = {};
+    let activeCategory = "all";
+    let searchQuery = "";
+
+    // Detect Active Network (Tailscale or LAN)
+    const hostname = window.location.hostname;
+    const isTailscale = hostname.includes('.ts.net') || hostname.startsWith('100.');
+    const isLan = hostname.startsWith('192.168.') || hostname.endsWith('.local') || hostname === 'localhost' || hostname === '127.0.0.1';
+
+    const netIndicator = document.getElementById('network-indicator');
+    const footerLan = document.getElementById('footer-lan');
+    const footerTs = document.getElementById('footer-tailscale');
+    if (isTailscale) {
+      netIndicator.innerHTML = `🌐 Active: <strong>Tailscale</strong> (<code>${hostname}</code>)`;
+      if (footerTs) footerTs.textContent = `Tailscale: ${hostname}`;
+    } else if (isLan) {
+      netIndicator.innerHTML = `🏠 Active: <strong>Local LAN</strong> (<code>${hostname}</code>)`;
+      if (footerLan) footerLan.textContent = `LAN: ${hostname}`;
+    } else {
+      netIndicator.innerHTML = `⚡ Host: <code>${hostname}</code>`;
+    }
+
+    // Load Initial Data
+    try {
+      const initialScript = document.getElementById('initial-services');
+      if (initialScript && initialScript.textContent.trim()) {
+        allServices = JSON.parse(initialScript.textContent);
+      }
+    } catch (e) {
+      console.error("Error reading initial embedded services:", e);
+    }
+
+    // Theme Management
+    const savedTheme = localStorage.getItem('hub-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    document.getElementById('btn-theme').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('hub-theme', next);
+      showToast(`Switched to ${next} theme`);
+    });
+
+    // Toast Utility
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      text.textContent = msg;
+      toast.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2200);
+    }
+
+    // Copy to Clipboard
+    window.copyText = function(text, label) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`Copied ${label}!`);
+        }).catch(() => fallbackCopy(text, label));
+      } else {
+        fallbackCopy(text, label);
+      }
+    };
+
+    function fallbackCopy(text, label) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast(`Copied ${label}!`);
+    }
+
+    // Render Cards
+    function renderCards() {
+      const grid = document.getElementById('services-grid');
+      const filtered = allServices.filter(s => {
+        const matchesCat = (activeCategory === "all" || s.category === activeCategory);
+        if (!matchesCat) return false;
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        const str = `${s.name} ${s.description} ${s.port} ${s.badge} ${s.category} ${s.id}`.toLowerCase();
+        return str.includes(q);
+      });
+
+      document.getElementById('service-count-text').textContent = `${allServices.length} services registered`;
+      document.getElementById('count-all').textContent = allServices.length;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px 16px; color: var(--text-muted);">
+            <p style="font-size: 1.1rem; font-weight: 500;">No services match your search.</p>
+            <p style="font-size: 0.85rem; margin-top: 6px;">Try searching for a different port or category.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(s => {
+        const status = serviceStatuses[s.id] || "online";
+        const isOnline = status === "online";
+        const iconSvg = ICONS[s.icon] || ICONS.globe;
+        const iconClass = `icon-${s.category || 'apps'}`;
+
+        // Smart primary launch URL: If user is on Tailscale, default launch button to Tailscale; else LAN
+        const primaryLaunchUrl = isTailscale ? s.tailscale_url : s.lan_url;
+        const primaryLaunchLabel = isTailscale ? "Open (Tailscale)" : "Open (LAN)";
+
+        return `
+          <div class="card" data-id="${s.id}" data-category="${s.category}">
+            <div>
+              <div class="card-top">
+                <div class="card-icon ${iconClass}">
+                  ${iconSvg}
+                </div>
+                <div class="card-meta">
+                  <div class="card-title-row">
+                    <h2 class="card-title" title="${s.name}">${s.name}</h2>
+                    <span class="status-dot ${isOnline ? 'online' : 'offline'}" title="${isOnline ? 'Online' : 'Offline'}"></span>
+                  </div>
+                  <div class="card-badges">
+                    <span class="badge badge-port">${s.port === 80 ? (s.path || 'Port 80') : 'Port ' + s.port}</span>
+                    <span class="badge badge-cat">${s.badge || s.category}</span>
+                  </div>
+                </div>
+              </div>
+
+              <p class="card-desc">${s.description}</p>
+            </div>
+
+            <div class="card-links">
+              <!-- LAN Link -->
+              <div class="link-row">
+                <div class="link-label">
+                  <span>🏠 LAN</span>
+                </div>
+                <div class="link-url-wrap">
+                  <a href="${s.lan_url}" class="link-url" target="_blank" rel="noopener noreferrer">${s.lan_url}</a>
+                </div>
+                <button class="btn-copy" onclick="copyText('${s.lan_url}', 'LAN link')" title="Copy LAN link" aria-label="Copy LAN link">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </div>
+
+              <!-- Tailscale Link -->
+              <div class="link-row">
+                <div class="link-label">
+                  <span>🌐 Tailscale</span>
+                </div>
+                <div class="link-url-wrap">
+                  <a href="${s.tailscale_url}" class="link-url" target="_blank" rel="noopener noreferrer">${s.tailscale_url}</a>
+                </div>
+                <button class="btn-copy" onclick="copyText('${s.tailscale_url}', 'Tailscale link')" title="Copy Tailscale link" aria-label="Copy Tailscale link">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </div>
+
+              <!-- Smart Primary Launch Button -->
+              <a href="${primaryLaunchUrl}" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                <span>${primaryLaunchLabel}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Fetch dynamic JSON data
+    async function fetchServices() {
+      try {
+        const resp = await fetch('./services.json?v=' + Date.now());
+        if (resp.ok) {
+          allServices = await resp.json();
+          renderCards();
+        }
+      } catch (e) {
+        console.warn("Using embedded fallback services list:", e);
+      }
+    }
+
+    async function fetchStatuses() {
+      try {
+        const resp = await fetch('./status.json?v=' + Date.now());
+        if (resp.ok) {
+          const data = await resp.json();
+          serviceStatuses = data.statuses || {};
+          renderCards();
+        }
+      } catch (e) {
+        console.warn("Could not fetch status.json:", e);
+      }
+    }
+
+    // Event Listeners: Search
+    const searchInput = document.getElementById('search-input');
+    const clearBtn = document.getElementById('clear-search');
+
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value.trim();
+      clearBtn.style.display = searchQuery ? 'block' : 'none';
+      renderCards();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      searchQuery = '';
+      clearBtn.style.display = 'none';
+      searchInput.focus();
+      renderCards();
+    });
+
+    // Event Listeners: Categories
+    document.getElementById('category-pills').addEventListener('click', (e) => {
+      const btn = e.target.closest('.cat-btn');
+      if (!btn) return;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.cat;
+      renderCards();
+    });
+
+    // Event Listener: Refresh
+    document.getElementById('btn-refresh').addEventListener('click', async () => {
+      showToast("Refreshing service statuses...");
+      await Promise.all([fetchServices(), fetchStatuses()]);
+      showToast("Services & health updated!");
+    });
+
+    // Initialize
+    renderCards();
+    fetchServices();
+    fetchStatuses();
+
+    // Auto refresh health every 30 seconds
+    setInterval(fetchStatuses, 30000);
+  </script>
+</body>
+</html>
