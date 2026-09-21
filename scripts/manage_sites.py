@@ -5,12 +5,14 @@ Supports adding, updating, listing, removing, and health-checking services.
 """
 
 import argparse
+import http.server
 import json
 import os
 import re
 import socket
 import subprocess
 import sys
+import threading
 import time
 import urllib.request
 from typing import Dict, Any, List, Optional
@@ -124,8 +126,15 @@ def load_config() -> Dict[str, Any]:
         or "100.64.0.1"
     )
 
+    port = int(
+        os.environ.get("DASHBOARD_PORT")
+        or cfg.get("port")
+        or 8080
+    )
+
     return {
         "web_dir": web_dir,
+        "port": port,
         "lan_host": lan_host,
         "tailscale_host": tailscale_host,
         "tailscale_ip": tailscale_ip,
@@ -387,6 +396,75 @@ def cmd_config(args, config):
             print(f"  {k} -> {v}")
 
 
+def create_request_handler(web_dir: str):
+    class DashboardHTTPHandler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=web_dir, **kwargs)
+
+        def end_headers(self):
+            # Disable caching for JSON files so updates to services/status are immediately reflected
+            if self.path.endswith(".json") or "?" in self.path:
+                self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+                self.send_header("Pragma", "no-cache")
+                self.send_header("Expires", "0")
+            super().end_headers()
+
+        def log_message(self, format, *args):
+            sys.stderr.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {format % args}\n")
+
+    return DashboardHTTPHandler
+
+
+def cmd_serve(args, config):
+    web_dir = args.web_dir or config.get("web_dir") or "/var/www/html"
+    port = args.port or config.get("port") or 8080
+    host = args.host or "0.0.0.0"
+
+    if not os.path.exists(web_dir):
+        print(f"Error: Web directory '{web_dir}' does not exist.", file=sys.stderr)
+        sys.exit(1)
+
+    # Initial health check run
+    try:
+        run_health_check(config)
+    except Exception as e:
+        print(f"Warning: Initial health check failed: {e}", file=sys.stderr)
+
+    # Background health check thread
+    def health_worker():
+        while True:
+            time.sleep(60)
+            try:
+                run_health_check(config)
+            except Exception as ex:
+                print(f"Warning: Periodic health check error: {ex}", file=sys.stderr)
+
+    worker_thread = threading.Thread(target=health_worker, daemon=True)
+    worker_thread.start()
+
+    handler_class = create_request_handler(web_dir)
+    try:
+        server = http.server.ThreadingHTTPServer((host, port), handler_class)
+    except Exception as e:
+        print(f"Error starting server on {host}:{port}: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    lan_ip = config.get("lan_host", "localhost")
+    print(f"\n⚡ Services Dashboard running on http://{host}:{port}/")
+    print(f"📁 Web Directory: {web_dir}")
+    print(f"🏠 Local LAN: http://{lan_ip}:{port}/")
+    if config.get("tailscale_host"):
+        print(f"🌐 Tailscale: http://{config['tailscale_host']}:{port}/")
+    print("Press Ctrl+C to stop.\n")
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nStopping dashboard server...")
+    finally:
+        server.server_close()
+
+
 def main():
     config = load_config()
 
@@ -395,6 +473,13 @@ def main():
         description="Services Dashboard Manager - Register and inspect hosted web services & ports"
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # serve
+    p_serve = subparsers.add_parser("serve", help="Start local web server for the dashboard")
+    p_serve.add_argument("--port", type=int, default=8080, help="Port to bind (default: 8080)")
+    p_serve.add_argument("--host", default="0.0.0.0", help="Host interface to bind (default: 0.0.0.0)")
+    p_serve.add_argument("--web-dir", help="Path to static web directory")
+    p_serve.set_defaults(func=lambda args: cmd_serve(args, config))
 
     # list
     p_list = subparsers.add_parser("list", help="List registered services")
